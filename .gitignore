@@ -1,0 +1,13 @@
+# .gitignore
+__pycache__
+venv
+env
+.pytest_cache
+.coverage
+*.pyc
+*.h5
+*.npy
+*.pickle
+*.csv
+data
+deap_data
