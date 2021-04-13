@@ -1,9 +1,8 @@
-
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
@@ -53,6 +52,8 @@ def cnn_lstm_classification(classes, label_type, sampling_rate, part_seconds, ig
 
 
 def cnn_lstm(train_x, test_x, train_y, test_y):
+    if not os.path.exists("models"):
+        os.path.mkdir("models")
     class_weights = \
         class_weight.compute_class_weight('balanced',
                                           np.unique(train_y),
