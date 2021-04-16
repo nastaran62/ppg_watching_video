@@ -21,23 +21,10 @@ from keras.models import Sequential
 from keras.models import Model
 from keras import optimizers
 from keras.layers import Dense, Dropout, LSTM
-
-from lstm_classification import prepare_deap_data, prepare_experimental_data
 from utils import validate_predictions
-from physiological.feature_extraction import get_ppg_features
-from physiological.preprocessing import physiological_preprocessing
-from load_data import load_all_physiological, load_all_labels, load_labels, load_deap_data
 
 
-def cnn_lstm_classification(classes, label_type, sampling_rate, part_seconds, ignore_time):
-    # Loading deap dataset
-    # physiological_data, labels = \
-    #    prepare_deap_data(classes, label_type, sampling_rate, ignore_time)
-
-    # Loading experimental dataset
-    physiological_data, labels = \
-        prepare_experimental_data(classes, label_type, sampling_rate, ignore_time)
-
+def cnn_lstm_classification(physiological_data, labels, classes):
     print(physiological_data.shape)
     print(labels.shape)
     # train_x, test_x, train_y, test_y = \
@@ -75,7 +62,6 @@ def cnn_lstm(train_x, test_x, train_y, test_y):
 
     n_steps = 10
     n_features = 1
-
     # reshape data into time steps of sub-sequences
     n_length = int(n_timesteps/n_steps)
     train_x = train_x.reshape((train_x.shape[0], n_steps, n_length, n_features))
@@ -133,11 +119,12 @@ def normal_train_test_split(physiological_data, labels):
                 np.array(labels))
 
     # Trial-based splitting
-    physiological_train, physiological_test, y_train, y_test = train_test_split(np.array(physiological_features),
-                                                                                np.array(labels),
-                                                                                test_size=0.3,
-                                                                                random_state=200,
-                                                                                stratify=labels)
+    physiological_train, physiological_test, y_train, y_test = \
+        train_test_split(np.array(physiological_features),
+                         np.array(labels),
+                         test_size=0.3,
+                         random_state=200,
+                         stratify=labels)
 
     return physiological_train, physiological_test, \
         y_train, y_test
