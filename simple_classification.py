@@ -1,7 +1,3 @@
-from sklearn.decomposition import PCA
-from physiological.feature_extraction import get_ppg_features
-from physiological.preprocessing import physiological_preprocessing
-from load_data import load_all_physiological, load_all_labels, load_labels, load_deap_data
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -23,8 +19,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.utils import shuffle
+from sklearn.decomposition import PCA
 
 from utils import validate_predictions
+from physiological.feature_extraction import get_ppg_features
 
 
 def pca_classification(physiological_data, labels, classes):
