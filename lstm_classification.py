@@ -31,7 +31,6 @@ def lstm_classification(physiological_data, labels, part_seconds, classes, sampl
 
     participants, trials = np.array(labels).shape
     all_physiological_features = []
-    i = 0
     print(physiological_data.shape)
     participants, trials, points = physiological_data.shape
     part_length = part_seconds * sampling_rate
@@ -50,7 +49,6 @@ def lstm_classification(physiological_data, labels, part_seconds, classes, sampl
                 ppg_labels = labels[p, t]
 
                 physiological_parts.append(get_ppg_features(ppg_data))
-                i += 1
             all_trial_labels.append(ppg_labels)
             all_trials_physiological.append(physiological_parts)
         all_participants_labels.append(all_trial_labels)
