@@ -93,7 +93,7 @@ def physiological_lstm_classifier(train_x, test_x, train_y, test_y, classes):
     Classifying physiological features
     '''
     if not os.path.exists("models"):
-        os.path.mkdir("models")
+        os.mkdir("models")
     print("train_x", train_x.shape)
     train_x, test_x = \
         feature_scaling_for_lstm(train_x, test_x, method="standard")
