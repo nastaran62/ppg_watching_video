@@ -116,8 +116,8 @@ physiological_data, labels = prepare_deap_data()
 # Loading experimental dataset
 #physiological_data, labels = prepare_experimental_data()
 
-# lstm_classification(physiological_data, labels, PART_SECONDS,
-#                    CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+lstm_classification(physiological_data, labels, PART_SECONDS,
+                    CLASSES, sampling_rate=PPG_SAMPLING_RATE)
 #cnn_lstm_classification(physiological_data, labels, CLASSES)
-feature_classification(physiological_data, labels, PART_SECONDS,
-                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+# feature_classification(physiological_data, labels, PART_SECONDS,
+#                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
