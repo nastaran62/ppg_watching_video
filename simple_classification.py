@@ -24,6 +24,7 @@ from sklearn.decomposition import PCA
 from utils import validate_predictions
 from physiological.feature_extraction import get_ppg_features
 
+from collections import OrderedDict
 
 def pca_classification(physiological_data, labels, classes):
     ppg_data = physiological_data[:, :, :]
@@ -92,23 +93,62 @@ def feature_classification(physiological_data, labels, part_seconds, classes, sa
 
 
 def physiological_classification(x_train, x_test, y_train, y_test, classes):
-    # clf = svm.SVC(probability=True)
-    # clf = svm.SVC(C=150, kernel="poly", degree=2, gamma="auto", probability=True)
-    clf = KNeighborsClassifier(n_neighbors=len(classes)+1)
-    clf = RandomForestClassifier(n_estimators=200)
-    # clf = AdaBoostClassifier(n_estimators=100, learning_rate=1)
-    #clf = GaussianNB()
-    # clf = QuadraticDiscriminantAnalysis()
-    # clf = LinearDiscriminantAnalysis()
-    # clf = MLPClassifier()
-    # clf = LinearDiscriminantAnalysis()
-    clf.fit(x_train, y_train)
+    # # clf = svm.SVC(probability=True)
+    # # clf = svm.SVC(C=150, kernel="poly", degree=2, gamma="auto", probability=True)
+    # clf = KNeighborsClassifier(n_neighbors=len(classes)+1)
+    # clf = RandomForestClassifier(n_estimators=200)
+    # # clf = AdaBoostClassifier(n_estimators=100, learning_rate=1)
+    # #clf = GaussianNB()
+    # # clf = QuadraticDiscriminantAnalysis()
+    # # clf = LinearDiscriminantAnalysis()
+    # # clf = MLPClassifier()
+    # # clf = LinearDiscriminantAnalysis()
+    # clf.fit(x_train, y_train)
+    # print("physiological prediction", clf.predict(x_test))
+    # pred_values = clf.predict_proba(x_test)
+
+    # # acc = accuracy_score(pred_values, y_test)
+    # # print(classification_report(y_test, pred_values))
+    # # print(acc)
+    # return pred_values
+   # #############################################################################
+    ensemble_clfs = [
+    ("RandomForestClassifier, max_features='sqrt'",
+        RandomForestClassifier( warm_start=True, oob_score=True,
+                               max_features="sqrt"))]
+
+
+    # ensemble_clfs = RandomForestClassifier(n_estimators=200)
+    # Map a classifier name to a list of (<n_estimators>, <error rate>) pairs.
+    error_rate = OrderedDict((label, []) for label, _ in ensemble_clfs)
+
+    # Range of `n_estimators` values to explore.
+    min_estimators = 15
+    max_estimators = 175
+    print(" Training Loop Begins")
+    for label, clf in ensemble_clfs:
+        for i in range(min_estimators, max_estimators+1):
+            clf.set_params(n_estimators=i)
+            clf.fit(x_train, y_train)
+            
+            # Record the OOB error for each `n_estimators=i` setting.
+            oob_error = 1 - clf.oob_score_
+            print("Number of Iteration: %d, oob score %f" % (i , clf.oob_score_))
+            error_rate[label].append((i, oob_error))
+
+    # Generate the "OOB error rate" vs. "n_estimators" plot.
+    for label, clf_err in error_rate.items():
+        xs, ys = zip(*clf_err)
+        plt.plot(xs, ys, label=label)
+
+    plt.xlim(min_estimators, max_estimators)
+    plt.xlabel("n_estimators")
+    plt.ylabel("OOB error rate")
+    plt.legend(loc="upper right")
+    plt.show()
+
     print("physiological prediction", clf.predict(x_test))
     pred_values = clf.predict_proba(x_test)
-
-    # acc = accuracy_score(pred_values, y_test)
-    # print(classification_report(y_test, pred_values))
-    # print(acc)
     return pred_values
 
 

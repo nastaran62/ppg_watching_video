@@ -5,7 +5,7 @@ from pywt import wavedec
 
 
 def get_ppg_features(ppg_data):
-    ppg_features = [np.mean(ppg_data), np.std(ppg_data)]
+    ppg_features = [np.mean(ppg_data), np.std(ppg_data), np.var(ppg_data), np.max(ppg_data), np.min(ppg_data)]
 
     feature = ppg_features
 
