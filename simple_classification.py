@@ -23,6 +23,9 @@ from sklearn.decomposition import PCA
 
 from utils import validate_predictions
 from physiological.feature_extraction import get_ppg_features
+import heartpy as hp
+
+
 
 
 def pca_classification(physiological_data, labels, classes):
@@ -52,6 +55,7 @@ def pca_classification(physiological_data, labels, classes):
     print(ppg_result)
 
 
+
 def feature_classification(physiological_data, labels, part_seconds, classes, sampling_rate=128):
     participants, trials = np.array(labels).shape
     participants, trials, points = physiological_data.shape
@@ -59,6 +63,7 @@ def feature_classification(physiological_data, labels, part_seconds, classes, sa
     part_length = part_seconds * sampling_rate
     part_count = int(points / part_length)
     all_participants_labels = []
+    
     for p in range(participants):
         all_trials_physiological = []
         all_trial_labels = []
@@ -66,9 +71,13 @@ def feature_classification(physiological_data, labels, part_seconds, classes, sa
             physiological_parts = []
             all_parts_labels = []
             for i in range(part_count):
-                physiological_parts.append(get_ppg_features(
-                    physiological_data[p, t, i*part_length:(i+1)*part_length]))
-                all_parts_labels.append(labels[p, t])
+                try: 
+                    print('participants: '  + str(p) + 'trail ' + str(t))
+                    #physiological_parts.append(get_ppg_features( physiological_data[p, t, i*part_length:(i+1)*part_length]))
+                    physiological_parts.append(get_ppg_features(physiological_data[p,t, :]))
+                    all_parts_labels.append(labels[p, t])
+                except Exception:
+                    print('error')
             all_trial_labels.append(all_parts_labels)
             all_trials_physiological.append(physiological_parts)
         all_participants_labels.append(all_trial_labels)
@@ -76,9 +85,23 @@ def feature_classification(physiological_data, labels, part_seconds, classes, sa
     physiological_data = np.array(all_physiological_features)
     all_participants_labels = np.array(all_participants_labels)
 
+
+
+
+
+
+
+
+
+
     physiological_train, physiological_test, \
         y_train, y_test = \
-        leave_one_subject_out_split(physiological_data, all_participants_labels)
+    normal_train_test_split(physiological_data, all_participants_labels)
+
+
+    # physiological_train, physiological_test, \
+    #     y_train, y_test = \
+    #     leave_one_subject_out_split(physiological_data, all_participants_labels)
 
     #physiological_train, physiological_test, \
     #    y_train, y_test = \
