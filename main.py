@@ -7,7 +7,7 @@ from simple_classification import feature_classification, kfold_testing
 
 
 WINDOW_SIZE = 1
-LABEL_TYPE = "arousal"
+LABEL_TYPE = "valence"
 PPG_SAMPLING_RATE = 128
 
 if LABEL_TYPE == "emotion":
@@ -85,7 +85,7 @@ physiological_data, labels = prepare_experimental_data()
 # lstm_classification(physiological_data, labels, WINDOW_SIZE,
 #                    CLASSES, sampling_rate=PPG_SAMPLING_RATE)
 #cnn_lstm_classification(physiological_data, labels, CLASSES)
-feature_classification(physiological_data, labels, WINDOW_SIZE,
-                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
-# kfold_testing(physiological_data, labels, WINDOW_SIZE,
-#              CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+# feature_classification(physiological_data, labels, WINDOW_SIZE,
+#                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+kfold_testing(physiological_data, labels, WINDOW_SIZE,
+              CLASSES, sampling_rate=PPG_SAMPLING_RATE)
