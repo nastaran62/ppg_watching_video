@@ -6,7 +6,7 @@ from cnn_lstm_classification import cnn_lstm_classification
 from simple_classification import feature_classification
 
 
-PART_SECONDS = 1
+PART_SECONDS = 20
 LABEL_TYPE = "arousal"
 PPG_SAMPLING_RATE = 128
 IGNORE_TIME = 8
@@ -17,40 +17,40 @@ else:
     CLASSES = [0, 1]
 
 
-def prepare_experimental_data():
-    path = "data/prepared_data"
-    label_path = "data/labels/self_report.csv"
-    all_labels = load_all_labels(label_path)
-    participant_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-                        32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43]
-    labels = load_all_labels(LABEL_TYPE)
-    all_labels = \
-        load_labels(labels, participant_list, type=LABEL_TYPE)
-    labels = all_labels
-    # CLASSES COUNT
-    for i in range(len(CLASSES)):
-        print("class count", CLASSES[i], (np.array(all_labels) == CLASSES[i]).sum())
+# def prepare_experimental_data():
+#     path = "data/prepared_data"
+#     label_path = "data/labels/self_report.csv"
+#     all_labels = load_all_labels(label_path)
+#     participant_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+#                         32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43]
+#     labels = load_all_labels(LABEL_TYPE)
+#     all_labels = \
+#         load_labels(labels, participant_list, type=LABEL_TYPE)
+#     labels = all_labels
+#     # CLASSES COUNT
+#     for i in range(len(CLASSES)):
+#         print("class count", CLASSES[i], (np.array(all_labels) == CLASSES[i]).sum())
 
-    physiological_data = load_all_physiological(path, participant_list)
+#     physiological_data = load_all_physiological(path, participant_list)
 
-    participants, trials = np.array(all_labels).shape
-    all_processed_physiological = []
-    for p in range(participants):
-        all_trials_physiological = []
-        for t in range(trials):
-            # preprocessing
-            # Ignores 8 seconds from the start of each trial
-            data = physiological_data[p, t, IGNORE_TIME*PPG_SAMPLING_RATE:, 0]
-            preprocessed_physiological = \
-                physiological_preprocessing(data,
-                                            sampling_rate=PPG_SAMPLING_RATE)
+#     participants, trials = np.array(all_labels).shape
+#     all_processed_physiological = []
+#     for p in range(participants):
+#         all_trials_physiological = []
+#         for t in range(trials):
+#             # preprocessing
+#             # Ignores 8 seconds from the start of each trial
+#             data = physiological_data[p, t, IGNORE_TIME*PPG_SAMPLING_RATE:, 0]
+#             preprocessed_physiological = \
+#                 physiological_preprocessing(data,
+#                                             sampling_rate=PPG_SAMPLING_RATE)
 
-            all_trials_physiological.append(preprocessed_physiological)
+#             all_trials_physiological.append(preprocessed_physiological)
 
-        all_processed_physiological.append(all_trials_physiological)
-    physiological_data = np.array(all_processed_physiological)
+#         all_processed_physiological.append(all_trials_physiological)
+#     physiological_data = np.array(all_processed_physiological)
 
-    return physiological_data, labels
+#     return physiological_data, labels
 
 
 def prepare_deap_data():
