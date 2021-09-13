@@ -1,40 +1,37 @@
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 import os
+import numpy as np
 import pickle
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score, precision_recall_fscore_support
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import classification_report, accuracy_score, \
+    precision_recall_fscore_support
 from sklearn.utils import class_weight
 
-from keras.utils import to_categorical
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.models import load_model
-from keras.models import Sequential
-from keras.models import Model
-from keras import optimizers
-from keras.layers import Dropout, LSTM, Dense
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.models import load_model
+from tensorflow.keras import optimizers
+from tensorflow.keras.layers import Dense, Dropout, LSTM
+from tensorflow.keras.models import Sequential
 
-from utils import validate_predictions
 from physiological.feature_extraction import get_ppg_features
+from utils import validate_predictions
 
 
 def lstm_classification(physiological_data, labels, part_seconds, classes, sampling_rate=128):
     '''
     Classify data using lstm method
     '''
-
     participants, trials = np.array(labels).shape
-    all_physiological_features = []
-    print(physiological_data.shape)
     participants, trials, points = physiological_data.shape
     part_length = part_seconds * sampling_rate
     part_count = int(points / part_length)
+    all_physiological_features = []
     all_participants_labels = []
     for p in range(participants):
         all_trials_physiological = []
@@ -72,19 +69,26 @@ def lstm_classification(physiological_data, labels, part_seconds, classes, sampl
 
 
 def feature_scaling_for_lstm(train, test, method="standard"):
+
+    mean = np.mean(train)
+    std = np.std(train)
+    train = (train - mean) / std
+    test = (test - mean) / std
+    '''
     scaler = StandardScaler()
     if method == "minmax":
         scaler = MinMaxScaler(feature_range=(0, 1))
     train_samples, train_times, train_features = train.shape
     test_samples, test_times, test_features = test.shape
-    train = train.reshape(train_samples*train_times, train_features)
-    test = test.reshape(test_samples*test_times, test_features)
+    train = train.reshape(train_samples, train_times*train_features)
+    test = test.reshape(test_samples, test_times*test_features)
     scaler.fit(train)
     train = scaler.transform(train)
     test = scaler.transform(test)
 
     train = train.reshape(train_samples, train_times, train_features)
     test = test.reshape(test_samples, test_times, test_features)
+    '''
     return train, test
 
 
@@ -92,9 +96,9 @@ def physiological_lstm_classifier(train_x, test_x, train_y, test_y, classes):
     '''
     Classifying physiological features
     '''
+    print("train_x", train_x.shape)
     if not os.path.exists("models"):
         os.mkdir("models")
-    print("train_x", train_x.shape)
     train_x, test_x = \
         feature_scaling_for_lstm(train_x, test_x, method="standard")
     class_weights = \
