@@ -33,10 +33,12 @@ def physiological_preprocessing(physiological_data, sampling_rate=128):
 
     preprocessed_ppg = ppg_preprocessing(physiological_data,
                                          sampling_rate)
-    data = normalization(np.array(preprocessed_ppg))
+    normalized = simple_baseline_normalization(preprocessed_ppg[sampling_rate*3:],
+                                               preprocessed_ppg[0:3*sampling_rate])
+    #normalized = normalization(np.array(preprocessed_ppg))
     # display_signal2(normalization(np.array(preprocessed_ppg)))
 
-    return data
+    return normalized
 
 
 def ppg_preprocessing(data, sampling_rate, low_pass=0.7, high_pass=2.5):
@@ -49,7 +51,26 @@ def ppg_preprocessing(data, sampling_rate, low_pass=0.7, high_pass=2.5):
     return filtered
 
 
+def baseline_normalization(data, baseline, sampling_rate=128):
+    length = int(baseline.shape[0] / sampling_rate)
+    all = []
+    for i in range(length):
+        all.append(baseline[i*sampling_rate:(i+1)*sampling_rate])
+    baseline = np.mean(np.array(all), axis=0)
+
+    window_count = round(data.shape[0] / sampling_rate)
+    for i in range(window_count):
+        data[i*sampling_rate:(i+1)*sampling_rate] -= baseline
+    return data
+
+
+def simple_baseline_normalization(data, baseline):
+    mean = np.mean(baseline)
+    return data - mean
+
+
 def normalization(data):
+    data = data[128*3:]
     # Normalization
     min = np.amin(data)
     max = np.amax(data)
