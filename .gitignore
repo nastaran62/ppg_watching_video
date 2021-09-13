@@ -5,9 +5,9 @@ env
 .pytest_cache
 .coverage
 *.pyc
+*.csv
 *.h5
 *.npy
 *.pickle
-*.csv
 data
 deap_data

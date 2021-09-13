@@ -1,16 +1,14 @@
-import heartpy as hp
 import numpy as np
 from load_data import load_all_physiological, load_all_labels, load_labels, load_deap_data
 from physiological.preprocessing import physiological_preprocessing
 from lstm_classification import lstm_classification
 from cnn_lstm_classification import cnn_lstm_classification
-from simple_classification import feature_classification
+from simple_classification import feature_classification, kfold_testing
 
 
-PART_SECONDS = 1
-LABEL_TYPE = "arousal"
+WINDOW_SIZE = 1
+LABEL_TYPE = "valence"
 PPG_SAMPLING_RATE = 128
-IGNORE_TIME = 8
 
 if LABEL_TYPE == "emotion":
     CLASSES = [0, 1, 2, 3, 4]
@@ -20,17 +18,13 @@ else:
 
 def prepare_experimental_data():
     path = "data/prepared_data"
-    label_path = "data/labels/self_report.csv"
-    all_labels = load_all_labels(label_path)
     participant_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
                         32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43]
-    labels = load_all_labels(LABEL_TYPE)
+    label_path = "data/labels/self_report.csv"
+    labels = load_all_labels(label_path)
     all_labels = \
         load_labels(labels, participant_list, type=LABEL_TYPE)
     labels = all_labels
-    # CLASSES COUNT
-    for i in range(len(CLASSES)):
-        print("class count", CLASSES[i], (np.array(all_labels) == CLASSES[i]).sum())
 
     physiological_data = load_all_physiological(path, participant_list)
 
@@ -41,7 +35,7 @@ def prepare_experimental_data():
         for t in range(trials):
             # preprocessing
             # Ignores 8 seconds from the start of each trial
-            data = physiological_data[p, t, IGNORE_TIME*PPG_SAMPLING_RATE:, 0]
+            data = physiological_data[p, t, :]
             preprocessed_physiological = \
                 physiological_preprocessing(data,
                                             sampling_rate=PPG_SAMPLING_RATE)
@@ -69,7 +63,7 @@ def prepare_deap_data():
         for t in range(ppg_data.shape[1]):
             # preprocessing
             # Ignores IGNORE_TIME seconds from the start of each trial
-            data = ppg_data[p, t, 0, IGNORE_TIME*PPG_SAMPLING_RATE:]
+            data = ppg_data[p, t, 0, :]
             preprocessed_physiological = \
                 physiological_preprocessing(data,
                                             sampling_rate=PPG_SAMPLING_RATE)
@@ -82,42 +76,16 @@ def prepare_deap_data():
     return ppg_data, labels
 
 
-def plot_deap_data(x, y):
-    # Loading deap dataset
-    ppg_data, labels = \
-        load_deap_data(label_type=LABEL_TYPE)
-
-    all_processed_physiological = []
-    for p in range(ppg_data.shape[0]):
-        all_trials_physiological = []
-        for t in range(ppg_data.shape[1]):
-            # preprocessing
-            # Ignores IGNORE_TIME seconds from the start of each trial
-            data = ppg_data[p, t, 0, IGNORE_TIME*PPG_SAMPLING_RATE:]
-            preprocessed_physiological = \
-                physiological_preprocessing(data,
-                                            sampling_rate=PPG_SAMPLING_RATE)
-
-            all_trials_physiological.append(preprocessed_physiological)
-
-        all_processed_physiological.append(all_trials_physiological)
-    ppg_data = np.array(all_processed_physiological)
-    print(ppg_data[x, y, :].shape)
-    return ppg_data[x, y, :]
-
-
-# using heartpy plotting utils for visulazation
-#wd, m = hp.process(plot_deap_data(3, 4), PPG_SAMPLING_RATE)
-#plot_object = hp.plotter(wd, m, show=True, title='some awesome title')
-
 # Loading deap dataset
-physiological_data, labels = prepare_deap_data()
+#physiological_data, labels = prepare_deap_data()
 
 # Loading experimental dataset
-#physiological_data, labels = prepare_experimental_data()
+physiological_data, labels = prepare_experimental_data()
 
-# lstm_classification(physiological_data, labels, PART_SECONDS,
+# lstm_classification(physiological_data, labels, WINDOW_SIZE,
 #                    CLASSES, sampling_rate=PPG_SAMPLING_RATE)
 #cnn_lstm_classification(physiological_data, labels, CLASSES)
-feature_classification(physiological_data, labels, PART_SECONDS,
-                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+# feature_classification(physiological_data, labels, WINDOW_SIZE,
+#                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+kfold_testing(physiological_data, labels, WINDOW_SIZE,
+              CLASSES, sampling_rate=PPG_SAMPLING_RATE)

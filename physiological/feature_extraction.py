@@ -12,17 +12,33 @@ def get_ppg_features(ppg_data):
     return np.array(feature)
 
 
-def _get_frequency_features(data):
+def prepare_ppg_components(ppg_data: np.array, sampling_rate: int,
+                           window_size: int = 20, overlap: int = 19):
+    '''
+    Extracts HR, HRV and breathing rate from PPG
 
-    (cA, cD) = pywt.dwt([1, 2, 3, 4, 5, 6], 'db1')
+    @param np.array ppg_data: PPG data
+    @param int sampling_rate: PPG sampling rate
 
-    bands = [cA, cD]
-    all_features = []
-    for band in range(len(bands)):
-        power = np.sum(bands[band]**2)
-        entropy = np.sum((bands[band]**2)*np.log(bands[band]**2))
-        all_features.extend([power, entropy])
-    return all_features
+    @keyword int window_length: Length of sliding window for measurment in seconds
+    @keyword float overlap: Amount of overlap between two windows in seconds
+
+    @rtype: dict(str: numpy.array)
+    @note: dict.keys = ["hr", "hrv", "breathing_rate"]
+
+    @return a dictionary of PPG components
+    '''
+
+    wd, m = hp.process_segmentwise(data,
+                                   sample_rate=sampling_rate,
+                                   segment_width=window_size,
+                                   segment_overlap=overlap/window_size)
+
+    hr_components = {"hr": np.array(m['bpm']),
+                     "hrv": np.array(m['sdsd']),
+                     "breathing_rate": np.array(m['breathingrate'])}
+
+    return hr_components
 
 
 def _get_multimodal_statistics(signal_data):
