@@ -124,7 +124,9 @@ def load_labels(labels, participant_list, type="emotion"):
 
 
 def load_deap_data(label_type="arousal"):
-    path = "deap_data/prepared_data"
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(dir_path, "deap_data/prepared_data")
+
     all_participants = os.listdir(path)
     all_participants.sort()
     all_participants_ppg = []

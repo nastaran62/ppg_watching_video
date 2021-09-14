@@ -6,7 +6,7 @@ from cnn_lstm_classification import cnn_lstm_classification
 from simple_classification import feature_classification, kfold_testing
 
 
-WINDOW_SIZE = 1
+WINDOW_SIZE = 20
 LABEL_TYPE = "valence"
 PPG_SAMPLING_RATE = 128
 
