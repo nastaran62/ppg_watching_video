@@ -16,6 +16,9 @@ def get_ppg_features(ppg_data):
     ##################################################################################
     # Static Values
     #################################################################################
+    #info = nk.ppg_findpeaks(ppg_data)
+    #peaks = info["PPG_Peaks"]
+
     hrv_time = nk.hrv_time(ppg_data, sampling_rate=128, show=True)
 
     hrv_madnn = hrv_time['HRV_MadNN'].values.tolist()

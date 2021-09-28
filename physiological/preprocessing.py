@@ -41,7 +41,9 @@ def physiological_preprocessing(physiological_data, sampling_rate=128):
     return normalized
 
 
-def ppg_preprocessing(data, sampling_rate, low_pass=0.7, high_pass=2.5):
+def ppg_preprocessing(data, sampling_rate, low_pass=0.5, high_pass=4):
+    # PPG signal range is between 0.5-4 Hz
+    # Source: Advances in Photopletysmography Signal Analysis for Biomedical Applications
     filtered = hp.filter_signal(data,
                                 [low_pass, high_pass],
                                 sample_rate=sampling_rate,
