@@ -3,10 +3,10 @@ from load_data import load_all_physiological, load_all_labels, load_labels, load
 from physiological.preprocessing import physiological_preprocessing
 from lstm_classification import lstm_classification
 from cnn_lstm_classification import cnn_lstm_classification
-from simple_classification import feature_classification, kfold_testing
+from simple_classification import feature_classification, kfold_testing, kfold_testing_new
 
 
-WINDOW_SIZE = 20
+WINDOW_SIZE = 5
 LABEL_TYPE = "valence"
 PPG_SAMPLING_RATE = 128
 
@@ -89,3 +89,5 @@ physiological_data, labels = prepare_experimental_data()
 #                       CLASSES, sampling_rate=PPG_SAMPLING_RATE)
 kfold_testing(physiological_data, labels, WINDOW_SIZE,
               CLASSES, sampling_rate=PPG_SAMPLING_RATE)
+kfold_testing_new(physiological_data, labels, WINDOW_SIZE,
+                  CLASSES, sampling_rate=PPG_SAMPLING_RATE)

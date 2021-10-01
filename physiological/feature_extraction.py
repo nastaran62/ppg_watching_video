@@ -8,32 +8,59 @@ import heartpy as hp
 PPG_SAMPLING_RATE = 128
 
 
+def display_signal(signal):
+    plt.plot(signal)
+    plt.xlabel('Time')
+    plt.ylabel('Amplitude')
+    plt.show()
+
+
 def get_ppg_features(ppg_data):
-    # wd, dict_data = hp.process(ppg_data, 128)
-    # feature =  list(dict_data.values())
-    # print(feature[1:6])
+    try:
+        wd, dict_data = hp.process(ppg_data, 128)
+        # print(wd)
+        # print("**************************")
+        # print(dict_data)
+        # print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        # feature = list(dict_data.values())
+        # print(feature[1:6])
 
-    ##################################################################################
-    # Static Values
-    #################################################################################
-    #info = nk.ppg_findpeaks(ppg_data)
-    #peaks = info["PPG_Peaks"]
+        ##################################################################################
+        # Static Values
+        #################################################################################
+        # peaks = nk.signal_rate(wd["peaklist"], sampling_rate=128,
+        #                       desired_length=len(ppg_data))
 
-    hrv_time = nk.hrv_time(ppg_data, sampling_rate=128, show=True)
+        # peaks = info["PPG_Peaks"]
 
-    hrv_madnn = hrv_time['HRV_MadNN'].values.tolist()
+        # hrv_time = nk.hrv_time(peaks, sampling_rate=128, show=True)
+        # print(hrv_time)
 
-    hrv_mcvnn = hrv_time['HRV_MCVNN'].values.tolist()
+        # hrv_freq = nk.hrv_frequency(peaks, sampling_rate=128, show=False)
 
-    hrv_iqrnn = hrv_time['HRV_IQRNN'].values.tolist()
+        # print(hrv_freq)
+        '''
+        hrv_madnn = hrv_time['HRV_MadNN'].values.tolist()
 
-    ppg_mean = [np.mean(ppg_data)]
+        hrv_mcvnn = hrv_time['HRV_MCVNN'].values.tolist()
 
-    ppg_std = [np.std(ppg_data)]
+        hrv_iqrnn = hrv_time['HRV_IQRNN'].values.tolist()
+        '''
+        ppg_mean = [np.mean(ppg_data)]
 
-    temp = hrv_madnn + hrv_mcvnn + hrv_iqrnn + ppg_mean + ppg_std
+        ppg_std = [np.std(ppg_data)]
 
-    return np.array(temp)
+        temp = [np.mean(ppg_data), np.std(ppg_data),
+                dict_data["bpm"], dict_data["ibi"], dict_data["sdnn"],
+                dict_data["sdsd"], dict_data["bpm"]]
+        if np.nan in temp or np.ma.masked in temp:
+            return []
+        else:
+            temp = np.array(temp)
+    except Exception as error:
+        temp = []
+
+    return temp
 
 
 def prepare_ppg_components(ppg_data: np.array, sampling_rate: int,
@@ -43,13 +70,10 @@ def prepare_ppg_components(ppg_data: np.array, sampling_rate: int,
 
     @param np.array ppg_data: PPG data
     @param int sampling_rate: PPG sampling rate
-
     @keyword int window_length: Length of sliding window for measurment in seconds
     @keyword float overlap: Amount of overlap between two windows in seconds
-
     @rtype: dict(str: numpy.array)
     @note: dict.keys = ["hr", "hrv", "breathing_rate"]
-
     @return a dictionary of PPG components
     '''
 
